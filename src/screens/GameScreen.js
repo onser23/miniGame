@@ -5,6 +5,7 @@ import {
   ImageBackground,
   TouchableOpacity,
   FlatList,
+  useWindowDimensions,
 } from "react-native";
 import React, { useEffect } from "react";
 import PrimaryButton from "../components/PrimaryButton";
@@ -15,6 +16,7 @@ import {
   setSystemWrongNumbers,
   setMinNumber,
   setMaxNumber,
+  setSystemRound,
 } from "../redux/action";
 
 const GameScreen = () => {
@@ -22,12 +24,12 @@ const GameScreen = () => {
     generateNumber();
   }, []);
 
-  const image = { uri: "https://wallpapercave.com/dwp1x/wp6936119.jpg" };
+  // const image = { uri: "https://wallpapercave.com/dwp1x/wp6936119.jpg" };
 
   const { GeneralResponse } = useSelector((state) => state);
 
   const dispatch = useDispatch();
-
+  let systemRound = GeneralResponse.systemRound + 1;
   const generateNumber = () => {
     const generateANumber =
       Math.floor(
@@ -41,9 +43,11 @@ const GameScreen = () => {
       dispatch(
         setSystemWrongNumbers({
           key: Math.random(),
+          systemRound: systemRound,
           wrongnumber: generateANumber,
         })
       );
+      dispatch(setSystemRound(systemRound));
     }
   };
 
@@ -63,9 +67,11 @@ const GameScreen = () => {
       dispatch(
         setSystemWrongNumbers({
           key: Math.random(),
+          systemRound: systemRound,
           wrongnumber: generateANumber,
         })
       );
+      dispatch(setSystemRound(systemRound));
     }
   };
 
@@ -86,15 +92,69 @@ const GameScreen = () => {
       dispatch(
         setSystemWrongNumbers({
           key: Math.random(),
+          systemRound: systemRound,
           wrongnumber: generateANumber,
         })
       );
+      dispatch(setSystemRound(systemRound));
     }
   };
-  // console.log("fffff", Math.random());
-  return (
-    <View style={styles.startGameMain}>
-      <ImageBackground source={image} resizeMode="cover" style={styles.image}>
+  const { width, height } = useWindowDimensions();
+
+  let content = (
+    <View style={styles.image}>
+      <View style={styles.startGameContainer}>
+        <View style={styles.guessMyNumberTextContainer}>
+          <Text style={styles.guessMyNumberText}>Proqramın Seçimi</Text>
+        </View>
+        <View style={styles.guessProgramNumberTextContainer}>
+          <Text style={styles.guessProgramNumberText}>
+            {GeneralResponse.systemChoiceNumber.slice(-1)}
+          </Text>
+        </View>
+        <View style={styles.inputTextContainer}>
+          <Text style={styles.inputTextContainerText}>
+            Rəqəmin böyükdür ya kiçik?
+          </Text>
+
+          <View style={styles.primaryButtonContainer}>
+            <TouchableOpacity
+              onPress={() => myNumberIsHigth()}
+              style={styles.primaryButtonContainerOwn}
+            >
+              <Text style={styles.primaryButtonText}>+</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => myNumberIslow()}
+              style={styles.primaryButtonContainerOwn}
+            >
+              <Text style={styles.primaryButtonText}>-</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={{ flex: 1 }}>
+          <FlatList
+            data={GeneralResponse.systemWrongNumbers}
+            renderItem={({ item }) => (
+              <View style={styles.previouseChoiceContainer}>
+                <Text style={styles.previouseChoiceText}>
+                  #{item.systemRound}
+                </Text>
+                <Text style={styles.previouseChoiceText}>
+                  Proqramın səhv seçimi: {item.wrongnumber}
+                </Text>
+              </View>
+            )}
+            keyExtractor={(item) => item.key}
+          />
+        </View>
+      </View>
+    </View>
+  );
+
+  if (width > 395) {
+    content = (
+      <View style={styles.image}>
         <View style={styles.startGameContainer}>
           <View style={styles.guessMyNumberTextContainer}>
             <Text style={styles.guessMyNumberText}>Proqramın Seçimi</Text>
@@ -105,10 +165,6 @@ const GameScreen = () => {
             </Text>
           </View>
           <View style={styles.inputTextContainer}>
-            <Text style={styles.inputTextContainerText}>
-              Rəqəmin böyükdür ya kiçik?
-            </Text>
-
             <View style={styles.primaryButtonContainer}>
               <TouchableOpacity
                 onPress={() => myNumberIsHigth()}
@@ -124,22 +180,28 @@ const GameScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-          <FlatList
-            data={GeneralResponse.systemWrongNumbers}
-            renderItem={({ item }) => (
-              <View style={styles.previouseChoiceContainer}>
-                <Text style={styles.previouseChoiceText}>#1</Text>
-                <Text style={styles.previouseChoiceText}>
-                  Proqramın səhv seçimi: {item.wrongnumber}
-                </Text>
-              </View>
-            )}
-            keyExtractor={(item) => item.key}
-          />
+          <View style={{ flex: 1 }}>
+            <FlatList
+              data={GeneralResponse.systemWrongNumbers}
+              renderItem={({ item }) => (
+                <View style={styles.previouseChoiceContainer}>
+                  <Text style={styles.previouseChoiceText}>
+                    #{item.systemRound}
+                  </Text>
+                  <Text style={styles.previouseChoiceText}>
+                    Proqramın səhv seçimi: {item.wrongnumber}
+                  </Text>
+                </View>
+              )}
+              keyExtractor={(item) => item.key}
+            />
+          </View>
         </View>
-      </ImageBackground>
-    </View>
-  );
+      </View>
+    );
+  }
+
+  return <View style={styles.startGameMain}>{content}</View>;
 };
 
 export default GameScreen;
@@ -151,6 +213,7 @@ const styles = StyleSheet.create({
   image: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#090854",
   },
   startGameContainer: {
     flex: 1,
@@ -167,7 +230,7 @@ const styles = StyleSheet.create({
   },
   guessMyNumberText: {
     color: "#fff",
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "bold",
     padding: 10,
   },
@@ -214,12 +277,14 @@ const styles = StyleSheet.create({
     borderColor: "#ffffff",
     marginBottom: 16,
     backgroundColor: "#41409a",
-    width: "88%",
+    width: "100%",
     justifyContent: "space-between",
     flexDirection: "row",
     paddingVertical: 8,
     paddingHorizontal: 13,
     borderRadius: 19,
+    elevation: 5,
+    shadowColor: "#ffffff",
   },
   previouseChoiceText: {
     color: "#ffffff",

@@ -3,26 +3,27 @@ import {
   Text,
   View,
   TextInput,
-  ImageBackground,
+  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import React from "react";
 import PrimaryButton from "../components/PrimaryButton";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
 
 import { setMyNumber } from "../redux/action";
 
 const StartGameScreen = () => {
-  const image = { uri: "https://wallpapercave.com/dwp1x/wp6936119.jpg" };
-
   const { GeneralResponse } = useSelector((state) => state);
 
   const dispatch = useDispatch();
-
+  const { width, height } = useWindowDimensions();
+  const marginTopDistance = height < 395 ? 30 : 100;
   return (
     <View style={styles.startGameMain}>
-      <ImageBackground source={image} resizeMode="cover" style={styles.image}>
-        <View style={styles.startGameContainer}>
+      <View style={styles.image}>
+        <View
+          style={[styles.startGameContainer, { marginTop: marginTopDistance }]}
+        >
           <View style={styles.guessMyNumberTextContainer}>
             <Text style={styles.guessMyNumberText}>Rəqəmi Tap</Text>
           </View>
@@ -41,24 +42,31 @@ const StartGameScreen = () => {
             </View>
           </View>
         </View>
-      </ImageBackground>
+      </View>
+
+      {/* </ImageBackground> */}
     </View>
   );
 };
 
 export default StartGameScreen;
 
+const deviceWidth = Dimensions.get("window").width;
+console.log("width", deviceWidth);
+const deviceHeight = Dimensions.get("window").height;
+console.log("deviceHeight", deviceHeight);
 const styles = StyleSheet.create({
   startGameMain: {
     flex: 1,
   },
   image: {
     flex: 1,
+    backgroundColor: "#090854",
     alignItems: "center",
   },
   startGameContainer: {
     flex: 1,
-    marginTop: 90,
+    // marginTop: 90,
     width: "85%",
     alignItems: "center",
   },
@@ -71,7 +79,7 @@ const styles = StyleSheet.create({
   },
   guessMyNumberText: {
     color: "#fff",
-    fontSize: 28,
+    fontSize: deviceWidth < 320 ? 21 : 26,
     fontWeight: "bold",
     padding: 10,
   },

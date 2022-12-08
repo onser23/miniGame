@@ -4,6 +4,7 @@ const INITIAL_STATE = {
   myNumber: "",
   systemChoiceNumber: [],
   systemWrongNumbers: [],
+  systemRound: 0,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -22,9 +23,10 @@ export default (state = INITIAL_STATE, action) => {
     case "SET_SYSTEMWRONGNUMBERS":
       return {
         ...state,
-        systemWrongNumbers: [...state.systemWrongNumbers, action.payload],
+        systemWrongNumbers: [action.payload, ...state.systemWrongNumbers],
       };
-
+    case "SET_SYSTEMROUND":
+      return { ...state, systemRound: action.payload };
     default:
       return state;
   }

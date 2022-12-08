@@ -32,3 +32,10 @@ export const setMaxNumber = (maxNumber) => {
     payload: maxNumber,
   };
 };
+
+export const setSystemRound = (systemRound) => {
+  return {
+    type: "SET_SYSTEMROUND",
+    payload: systemRound,
+  };
+};
